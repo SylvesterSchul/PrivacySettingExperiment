@@ -25,8 +25,8 @@ Choose the right setting configuration based on 9 tasks. Each individual task wi
 Measurements include task completion time and setting changed. Please right down these two measurements onto paper after completing a task. Make sure to differentiate the next button for user interface.
 and the task complete button for Interface B. Once pressing the task complete button, it will record the last setting changed and the timer to complete the current task.
 
-IMPORTANT:
-Out of the nine settings that were configured, identify the three tasks that involved permitting data to flow between Testbook and outside websites or applications.
+IMPORTANT CORRECTION TO EXPLORATORY TASK:
+Out of the nine settings that were configured, identify the three tasks that involve configuring future data to flow between Testbook and outside websites or applications.
 
 System Usability Scale:
 Determine how useful the mock and experimental user interface are from the ten questions after completing the task experiments.
