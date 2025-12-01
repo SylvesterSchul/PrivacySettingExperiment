@@ -21,18 +21,22 @@ Low Risk includes Protective features and preferences.
 Pre-Experiment Questionnaire:
 Gain insight about participants viewpoints on privacy settings that involve data leaving or entering the website based on third party.
 Task Experiment:
-  -Choose the right setting configuration based on 9 tasks. Each individual task will be displayed a task and the participant can start the timer and access the privacy settings user interface. 
+Choose the right setting configuration based on 9 tasks. Each individual task will be displayed a task and the participant can start the timer and access the privacy settings user interface. 
 Measurements include task completion time and setting changed. Please right down these two measurements onto paper after completing a task. Make sure to differentiate the next button for user interface.
 and the task complete button for Interface B. Once pressing the task complete button, it will record the last setting changed and the timer to complete the current task.
 Once all nine tasks are completed please identify the three tasks that affected the users' data entering or leaving the social media website.
-  -System Usability Scale:
+
+System Usability Scale:
 Determine how useful the mock and experimental user interface are from the ten questions after completing the task experiments.
 
 Ending Notes:
-Mock user interface for facebook will not require the participants to use their own account. I made the mock user interface based off of the Privacy Checkup, which is not as extensive 
-as the settings and privacy webpage for facebook and the accounts center for Meta. The three seperate webpages to configure settings made it hard to replicate in a "all-in-one" 
+Mock user interface for facebook will not require the participants to use their own account. I made the mock user interface based off of the Privacy Checkup, which is not as extensive as the settings and privacy webpage for facebook and the accounts center for Meta. The three seperate webpages to configure settings made it hard to replicate in a "all-in-one" 
 user interface, but it is better than requiring the participant to create and use their own account. Thank you for participating and helping me gather statistics to be used for my
 project.
+
+Group A: https://sylvesterschul.github.io/PrivacySettingExperiment/groupA.html
+
+Group B : https://sylvesterschul.github.io/PrivacySettingExperiment/groupB.html
 
 For questions about the research, problems, or complaints:
 Sylvester Schulteis
