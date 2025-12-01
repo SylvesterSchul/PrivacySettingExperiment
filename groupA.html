@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Settings Study - Group A</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; color: #1c1e21; line-height: 1.4; }
+        .task-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #6c5ce7 0%, #4834d4 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 40px; }
+        .task-screen.hidden { display: none; }
+        .task-number { font-size: 18px; color: rgba(255,255,255,0.8); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 2px; }
+        .task-text { font-size: 32px; color: white; text-align: center; max-width: 700px; line-height: 1.4; margin-bottom: 40px; font-weight: 600; }
+        .start-btn { padding: 20px 60px; font-size: 20px; font-weight: 700; background: white; color: #6c5ce7; border: none; border-radius: 12px; cursor: pointer; }
+        .start-btn:hover { transform: scale(1.05); }
+        .results-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #31a24c 0%, #1d7a35 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 40px; }
+        .results-screen.hidden { display: none; }
+        .results-icon { font-size: 64px; margin-bottom: 20px; }
+        .results-title { font-size: 28px; color: white; margin-bottom: 12px; font-weight: 700; }
+        .results-time { font-size: 64px; color: white; font-weight: 700; margin-bottom: 8px; }
+        .results-label { font-size: 18px; color: rgba(255,255,255,0.8); margin-bottom: 20px; }
+        .results-setting { background: rgba(255,255,255,0.2); padding: 16px 24px; border-radius: 8px; margin-bottom: 20px; font-size: 15px; color: white; max-width: 500px; text-align: center; }
+        .results-setting strong { display: block; margin-top: 8px; font-size: 17px; }
+        .results-instruction { font-size: 16px; color: rgba(255,255,255,0.9); background: rgba(0,0,0,0.2); padding: 16px 24px; border-radius: 8px; margin-bottom: 32px; }
+        .next-btn { padding: 20px 60px; font-size: 20px; font-weight: 700; background: white; color: #31a24c; border: none; border-radius: 12px; cursor: pointer; }
+        .next-btn:hover { transform: scale(1.05); }
+        .final-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #6c5ce7 0%, #4834d4 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 40px; }
+        .final-screen.hidden { display: none; }
+        .final-icon { font-size: 80px; margin-bottom: 24px; }
+        .final-title { font-size: 36px; color: white; font-weight: 700; margin-bottom: 16px; }
+        .final-subtitle { font-size: 18px; color: rgba(255,255,255,0.9); margin-bottom: 32px; }
+        .final-instruction { font-size: 16px; color: rgba(255,255,255,0.9); background: rgba(0,0,0,0.2); padding: 16px 24px; border-radius: 8px; }
+        .timer-bar { position: fixed; top: 0; left: 0; right: 0; background: #1c1e21; color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; z-index: 500; }
+        .timer-bar.hidden { display: none; }
+        .task-bar { position: fixed; top: 0; left: 0; right: 0; background: #1c1e21; color: white; padding: 12px 20px; z-index: 500; }
+        .task-bar.hidden { display: none; }
+        .task-bar-text { font-size: 15px; }
+        .task-bar-text strong { color: #6c5ce7; }
+        .timer-task { font-size: 14px; max-width: 60%; }
+        .timer-task strong { color: #6c5ce7; }
+        .timer-display { font-size: 32px; font-weight: 700; font-family: monospace; color: #4ade80; }
+        .complete-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 16px 20px; box-shadow: 0 -2px 8px rgba(0,0,0,0.1); z-index: 500; display: flex; justify-content: center; }
+        .complete-bar.hidden { display: none; }
+        .complete-btn { padding: 16px 48px; font-size: 18px; font-weight: 700; background: #31a24c; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .main-interface { display: none; padding-top: 70px; padding-bottom: 80px; }
+        .main-interface.visible { display: block; }
+        .header { background: #ffffff; border-bottom: 1px solid #dddfe2; padding: 12px 20px; position: fixed; top: 56px; left: 0; right: 0; z-index: 400; display: flex; align-items: center; gap: 16px; }
+        .tb-logo { width: 40px; height: 40px; background: #6c5ce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 24px; }
+        .header-title { font-size: 20px; font-weight: 700; }
+        .container { max-width: 680px; margin: 0 auto; padding: 80px 20px 20px; }
+        .page-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .page-subtitle { font-size: 15px; color: #65676b; margin-bottom: 24px; }
+        .settings-card { background: #ffffff; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden; margin-bottom: 16px; }
+        .section-header { padding: 16px 20px; background: #6c5ce7; color: white; font-size: 16px; font-weight: 700; }
+        .subsection-header { padding: 12px 20px; background: #f7f8fa; border-bottom: 1px solid #e4e6eb; font-size: 13px; font-weight: 700; color: #65676b; text-transform: uppercase; }
+        .setting { padding: 16px 20px; border-bottom: 1px solid #e4e6eb; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .setting:last-child { border-bottom: none; }
+        .setting:hover { background: #f7f8fa; }
+        .setting-info { flex: 1; }
+        .setting-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+        .setting-description { font-size: 13px; color: #65676b; }
+        .dropdown { padding: 8px 12px; border: 1px solid #ccd0d5; border-radius: 6px; background: #ffffff; font-size: 14px; cursor: pointer; min-width: 140px; }
+        .toggle { position: relative; width: 48px; height: 28px; background: #ccd0d5; border-radius: 14px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .toggle.on { background: #6c5ce7; }
+        .toggle-knob { position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: #ffffff; border-radius: 50%; transition: left 0.2s; }
+        .toggle.on .toggle-knob { left: 22px; }
+        .action-btn { padding: 8px 16px; background: #e4e6eb; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .action-btn:hover { background: #d8dadf; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 600; align-items: center; justify-content: center; }
+        .modal-overlay.visible { display: flex; }
+        .modal { background: white; border-radius: 12px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #e4e6eb; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 18px; font-weight: 700; }
+        .modal-close { width: 32px; height: 32px; border: none; background: #e4e6eb; border-radius: 50%; font-size: 18px; cursor: pointer; }
+        .modal-body { padding: 20px; }
+        .modal-description { font-size: 14px; color: #65676b; margin-bottom: 16px; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid #e4e6eb; display: flex; justify-content: flex-end; gap: 12px; }
+        .modal-btn { padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+        .modal-btn-cancel { background: #e4e6eb; }
+        .modal-btn-primary { background: #6c5ce7; color: white; }
+        .modal-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #e4e6eb; }
+        .modal-toggle-info { flex: 1; }
+        .modal-toggle-title { font-weight: 500; margin-bottom: 4px; }
+        .modal-toggle-desc { font-size: 13px; color: #65676b; }
+        .modal-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #e4e6eb; border-radius: 8px; margin-bottom: 8px; }
+        .modal-item-info { display: flex; align-items: center; gap: 12px; }
+        .modal-item-icon { width: 40px; height: 40px; background: #e4e6eb; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .modal-item-name { font-weight: 500; }
+        .modal-item-detail { font-size: 12px; color: #65676b; }
+        .modal-remove-btn { padding: 6px 12px; background: #ffebeb; color: #fa3e3e; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; }
+        .modal-input-group { margin-bottom: 16px; }
+        .modal-input-label { font-size: 14px; font-weight: 500; margin-bottom: 8px; display: block; }
+        .modal-input { width: 100%; padding: 12px; border: 1px solid #ccd0d5; border-radius: 8px; font-size: 14px; }
+        .modal-empty { text-align: center; padding: 32px; color: #65676b; }
+        .modal-empty-icon { font-size: 48px; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <div class="task-screen" id="taskScreen">
+        <div class="task-number" id="taskNumber">Task 1 of 9</div>
+        <div class="task-text" id="taskText">Loading task...</div>
+        <button class="start-btn" onclick="startTask()">Start Task</button>
+    </div>
+    
+    <div class="results-screen hidden" id="resultsScreen">
+        <div class="results-icon"></div>
+        <div class="results-title">Task Complete!</div>
+        <div class="results-time" id="resultsTime">0.00s</div>
+        <div class="results-label">seconds</div>
+        <div class="results-setting">Setting changed:<strong id="settingName">None detected</strong></div>
+        <div class="results-instruction">Write down this time and setting on your sheet.</div>
+        <button class="next-btn" id="nextBtn" onclick="nextTask()">Next Task →</button>
+    </div>
+    
+    <div class="final-screen hidden" id="finalScreen">
+        <div class="final-icon">Complete</div>
+        <div class="final-title">All Tasks Complete!</div>
+        <div class="final-subtitle">You have completed all 9 tasks.</div>
+        <div class="final-instruction">Continue to the System Usability Scale</div>
+    </div>
+    
+    <div class="timer-bar hidden" id="timerBar">
+        <div class="timer-task" id="timerTask"></div>
+        <div class="timer-display" id="timerDisplay">0.00</div>
+    </div>
+    
+    <div class="task-bar hidden" id="taskBar">
+        <div class="task-bar-text" id="taskBarText"></div>
+    </div>
+    
+    <div class="complete-bar hidden" id="completeBar">
+        <button class="complete-btn" onclick="completeTask()">Task Completed</button>
+    </div>
+    
+    <!-- MODALS -->
+    <div class="modal-overlay" id="modalApps">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title">Apps and Websites</div><button class="modal-close" onclick="closeModal('modalApps')">×</button></div>
+            <div class="modal-body">
+                <div class="modal-description">These apps have access to your Testbook data. Control what information each app can access.</div>
+                <div class="modal-item" style="flex-direction:column;align-items:stretch;gap:12px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div class="modal-item-icon">G</div>
+                        <div><div class="modal-item-name">GameApp Pro</div><div class="modal-item-detail">Connected 3 months ago</div></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+                        <select class="dropdown" data-setting="Apps and websites - GameApp Pro access" style="flex:1">
+                            <option selected>Non-public</option>
+                            <option>Public</option>
+                        </select>
+                        <button class="modal-remove-btn" data-setting="Apps and websites - Remove GameApp">Remove</button>
+                    </div>
+                </div>
+                <div class="modal-item" style="flex-direction:column;align-items:stretch;gap:12px;margin-top:8px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div class="modal-item-icon">S</div>
+                        <div><div class="modal-item-name">ShopEasy</div><div class="modal-item-detail">Connected 1 month ago</div></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+                        <select class="dropdown" data-setting="Apps and websites - ShopEasy access" style="flex:1">
+                            <option selected>Non-public</option>
+                            <option>Public</option>
+                        </select>
+                        <button class="modal-remove-btn" data-setting="Apps and websites - Remove ShopEasy">Remove</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('modalApps')">Cancel</button><button class="modal-btn modal-btn-primary" onclick="closeModal('modalApps')" data-setting="Apps and websites">Save</button></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalOffTestbook">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title">Off-Testbook Activity</div><button class="modal-close" onclick="closeModal('modalOffTestbook')">×</button></div>
+            <div class="modal-body">
+                <div class="modal-description">Websites and apps that have shared your activity with Testbook.</div>
+                <div class="modal-item" id="offItem1" style="flex-direction:row;align-items:center;justify-content:space-between">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div class="modal-item-icon">A</div>
+                        <div><div class="modal-item-name">Amazon</div><div class="modal-item-detail">12 interactions</div></div>
+                    </div>
+                    <button class="modal-remove-btn" onclick="disconnectSite('offItem1')" data-setting="Off-Testbook activity">Disconnect</button>
+                </div>
+                <div class="modal-item" id="offItem2" style="flex-direction:row;align-items:center;justify-content:space-between;margin-top:8px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div class="modal-item-icon">N</div>
+                        <div><div class="modal-item-name">Netflix</div><div class="modal-item-detail">8 interactions</div></div>
+                    </div>
+                    <button class="modal-remove-btn" onclick="disconnectSite('offItem2')" data-setting="Off-Testbook activity">Disconnect</button>
+                </div>
+                <div class="modal-item" id="offItem3" style="flex-direction:row;align-items:center;justify-content:space-between;margin-top:8px">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div class="modal-item-icon">S</div>
+                        <div><div class="modal-item-name">Spotify</div><div class="modal-item-detail">5 interactions</div></div>
+                    </div>
+                    <button class="modal-remove-btn" onclick="disconnectSite('offItem3')" data-setting="Off-Testbook activity">Disconnect</button>
+                </div>
+                <div id="offEmptyMsg" style="display:none;text-align:center;padding:20px;color:#65676b">No activity to show</div>
+                <div style="padding-top:16px;border-top:1px solid #e4e6eb;margin-top:16px">
+                    <button class="action-btn" style="width:100%;padding:12px;background:#ffebeb;color:#fa3e3e" onclick="clearAllOffTestbook()" data-setting="Off-Testbook activity">Clear All History</button>
+                    <p style="font-size:12px;color:#65676b;margin-top:8px;text-align:center">This will disconnect all sites and clear activity history</p>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn modal-btn-primary" onclick="closeModal('modalOffTestbook')">Done</button></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalBlock">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title">Block Profiles and Pages</div><button class="modal-close" onclick="closeModal('modalBlock')">×</button></div>
+            <div class="modal-body">
+                <div class="modal-description">Block people from seeing your posts or contacting you.</div>
+                <div class="modal-input-group"><label class="modal-input-label">Add name or email to block</label><input type="text" class="modal-input" placeholder="Enter name or email..." data-setting="Block profiles and Pages"></div>
+                <div class="modal-empty"><div class="modal-empty-icon"></div><div>No blocked profiles</div></div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('modalBlock')">Cancel</button><button class="modal-btn modal-btn-primary" onclick="closeModal('modalBlock')" data-setting="Block profiles and Pages">Block</button></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalRestricted">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title">Restricted List</div><button class="modal-close" onclick="closeModal('modalRestricted')">×</button></div>
+            <div class="modal-body">
+                <div class="modal-description">People here can only see your public posts.</div>
+                <div class="modal-input-group"><label class="modal-input-label">Add friend to restricted list</label><input type="text" class="modal-input" placeholder="Enter name..." data-setting="Restricted list"></div>
+                <div class="modal-empty"><div class="modal-empty-icon"></div><div>No one is restricted</div></div>
+            </div>
+            <div class="modal-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('modalRestricted')">Cancel</button><button class="modal-btn modal-btn-primary" onclick="closeModal('modalRestricted')" data-setting="Restricted list">Add</button></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalBlockMessages">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title">Block Messages</div><button class="modal-close" onclick="closeModal('modalBlockMessages')">×</button></div>
+            <div class="modal-body"><div class="modal-description">Block people from messaging you.</div><div class="modal-input-group"><label class="modal-input-label">Block messages from</label><input type="text" class="modal-input" placeholder="Enter name..." data-setting="Block messages"></div><div class="modal-empty"><div class="modal-empty-icon"></div><div>No blocked senders</div></div></div>
+            <div class="modal-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('modalBlockMessages')">Cancel</button><button class="modal-btn modal-btn-primary" onclick="closeModal('modalBlockMessages')" data-setting="Block messages">Block</button></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalBlockApps">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title">Block App Invites</div><button class="modal-close" onclick="closeModal('modalBlockApps')">×</button></div>
+            <div class="modal-body"><div class="modal-description">Block app invites from specific people.</div><div class="modal-input-group"><label class="modal-input-label">Block invites from</label><input type="text" class="modal-input" placeholder="Enter name..." data-setting="Block app invites"></div><div class="modal-empty"><div class="modal-empty-icon"></div><div>No blocked senders</div></div></div>
+            <div class="modal-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('modalBlockApps')">Cancel</button><button class="modal-btn modal-btn-primary" onclick="closeModal('modalBlockApps')" data-setting="Block app invites">Block</button></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalBlockEvents">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title">Block Event Invites</div><button class="modal-close" onclick="closeModal('modalBlockEvents')">×</button></div>
+            <div class="modal-body"><div class="modal-description">Block event invites from specific people.</div><div class="modal-input-group"><label class="modal-input-label">Block invites from</label><input type="text" class="modal-input" placeholder="Enter name..." data-setting="Block event invites"></div><div class="modal-empty"><div class="modal-empty-icon"></div><div>No blocked senders</div></div></div>
+            <div class="modal-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('modalBlockEvents')">Cancel</button><button class="modal-btn modal-btn-primary" onclick="closeModal('modalBlockEvents')" data-setting="Block event invites">Block</button></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalLimitPosts">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title">Limit Past Posts</div><button class="modal-close" onclick="closeModal('modalLimitPosts')">×</button></div>
+            <div class="modal-body"><div class="modal-description">Change old posts from Public to Friends only.</div><div style="background:#fff4e0;padding:16px;border-radius:8px"><div style="font-weight:600;color:#b36b00"> This cannot be undone</div></div></div>
+            <div class="modal-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('modalLimitPosts')">Cancel</button><button class="modal-btn modal-btn-primary" onclick="closeModal('modalLimitPosts')" data-setting="Limit past posts">Limit Posts</button></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalDownload">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title">Download Your Information</div><button class="modal-close" onclick="closeModal('modalDownload')">×</button></div>
+            <div class="modal-body"><div class="modal-description">Get a copy of your Testbook data.</div></div>
+            <div class="modal-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('modalDownload')">Cancel</button><button class="modal-btn modal-btn-primary" onclick="closeModal('modalDownload')" data-setting="Download your information">Download</button></div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalHideComments">
+        <div class="modal">
+            <div class="modal-header"><div class="modal-title">Hide Comments with Words</div><button class="modal-close" onclick="closeModal('modalHideComments')">×</button></div>
+            <div class="modal-body"><div class="modal-description">Comments with these words will be hidden.</div><div class="modal-input-group"><label class="modal-input-label">Words to hide</label><input type="text" class="modal-input" placeholder="spam, hate..." data-setting="Hide comments with certain words"></div></div>
+            <div class="modal-footer"><button class="modal-btn modal-btn-cancel" onclick="closeModal('modalHideComments')">Cancel</button><button class="modal-btn modal-btn-primary" onclick="closeModal('modalHideComments')" data-setting="Hide comments with certain words">Save</button></div>
+        </div>
+    </div>
+    
+    <!-- MAIN INTERFACE -->
+    <div class="main-interface" id="mainInterface">
+        <div class="header"><div class="tb-logo">T</div><div class="header-title">Privacy Settings</div></div>
+        <div class="container">
+            <h1 class="page-title">Privacy Checkup</h1>
+            <p class="page-subtitle">Review and manage your privacy settings (50 settings)</p>
+            
+            <!-- CATEGORY 1: WHO CAN SEE WHAT YOU SHARE -->
+            <div class="settings-card">
+                <div class="section-header">Who Can See What You Share</div>
+                <div class="subsection-header">Profile Information</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Public profile info</div><div class="setting-description">What info is visible to people not in your friends list</div></div><select class="dropdown" data-setting="Public profile info"><option>Full profile</option><option selected>Limited</option><option>Minimal</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see your email address?</div><div class="setting-description">Control who sees your email on your profile</div></div><select class="dropdown" data-setting="Who can see your email address"><option>Public</option><option>Friends</option><option selected>Only me</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see your birthday (date)?</div><div class="setting-description">Control who sees your birth date</div></div><select class="dropdown" data-setting="Who can see your birthday (date)"><option>Public</option><option selected>Friends of friends</option><option>Friends</option><option>Only me</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see your birthday (year)?</div><div class="setting-description">Control who sees your birth year</div></div><select class="dropdown" data-setting="Who can see your birthday (year)"><option>Public</option><option selected>Friends of friends</option><option>Friends</option><option>Only me</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see your relationship status?</div><div class="setting-description">Control who sees your relationship status</div></div><select class="dropdown" data-setting="Who can see your relationship status"><option selected>Public</option><option>Friends</option><option>Only me</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see your friends list?</div><div class="setting-description">Control who sees your list of friends</div></div><select class="dropdown" data-setting="Who can see your friends list"><option selected>Public</option><option>Friends</option><option>Only me</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see the people, Pages and lists you follow?</div><div class="setting-description">Control who sees your following list</div></div><select class="dropdown" data-setting="Who can see people/Pages you follow"><option selected>Public</option><option>Friends</option><option>Only me</option></select></div>
+                
+                <div class="subsection-header">Audience</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see your future posts?</div><div class="setting-description">Default audience for posts you create</div></div><select class="dropdown" data-setting="Who can see your future posts"><option selected>Public</option><option>Friends</option><option>Only me</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see your stories?</div><div class="setting-description">Choose who can view your stories</div></div><select class="dropdown" data-setting="Who can see your stories"><option>Public</option><option selected>Friends</option><option>Only me</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Limit who can see past posts</div><div class="setting-description">Change old posts from Public to Friends only</div></div><button class="action-btn" onclick="openModal('modalLimitPosts')" data-setting="Limit past posts">Limit Past Posts</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see your reels?</div><div class="setting-description">Control who can view your reels</div></div><select class="dropdown" data-setting="Who can see your reels"><option selected>Public</option><option>Friends</option><option>Only me</option></select></div>
+                
+                <div class="subsection-header">Tagging</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see posts you're tagged in on your profile?</div><div class="setting-description">Visibility of posts where others tagged you</div></div><select class="dropdown" data-setting="Who can see posts you're tagged in"><option>Public</option><option selected>Friends of friends</option><option>Friends</option><option>Only me</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">When you're tagged, who do you want to add to the audience?</div><div class="setting-description">When tagged, your friends may see the post</div></div><select class="dropdown" data-setting="When tagged, who to add to audience"><option selected>Friends</option><option>Only me</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Review tags people add to your posts before they appear?</div><div class="setting-description">Approve tags before they're visible to others</div></div><div class="toggle" data-setting="Review tags before appearing"><div class="toggle-knob"></div></div></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Review posts you're tagged in before they appear on your profile?</div><div class="setting-description">Approve tagged posts before they show on your profile</div></div><div class="toggle" data-setting="Review tagged posts before profile"><div class="toggle-knob"></div></div></div>
+                
+                <div class="subsection-header">Blocking</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Restricted list</div><div class="setting-description">Limit what specific people can see</div></div><button class="action-btn" onclick="openModal('modalRestricted')" data-setting="Restricted list">Edit</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Block profiles and Pages</div><div class="setting-description">Prevent people from interacting with you</div></div><button class="action-btn" onclick="openModal('modalBlock')" data-setting="Block profiles and Pages">Edit</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Block messages</div><div class="setting-description">Prevent Messenger contact from specific people</div></div><button class="action-btn" onclick="openModal('modalBlockMessages')" data-setting="Block messages">Edit</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Block app invites</div><div class="setting-description">Stop game and app invite spam</div></div><button class="action-btn" onclick="openModal('modalBlockApps')" data-setting="Block app invites">Edit</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Block event invites</div><div class="setting-description">Stop event invite spam</div></div><button class="action-btn" onclick="openModal('modalBlockEvents')" data-setting="Block event invites">Edit</button></div>
+                
+                <div class="subsection-header">Comments and Links</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Show most relevant comments first</div><div class="setting-description">Sort comments by relevance instead of time</div></div><div class="toggle on" data-setting="Show most relevant comments first"><div class="toggle-knob"></div></div></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Hide comments with certain words</div><div class="setting-description">Filter out comments containing specific words</div></div><button class="action-btn" onclick="openModal('modalHideComments')" data-setting="Hide comments with certain words">Manage</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Off-Testbook previews</div><div class="setting-description">Show previews when your public posts are shared elsewhere</div></div><div class="toggle on" data-setting="Off-Testbook previews"><div class="toggle-knob"></div></div></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Show previews of links</div><div class="setting-description">Show link preview cards when you share URLs</div></div><div class="toggle on" data-setting="Show previews of links"><div class="toggle-knob"></div></div></div>
+            </div>
+            
+            <!-- CATEGORY 2: HOW PEOPLE CAN FIND YOU -->
+            <div class="settings-card">
+                <div class="section-header">How People Can Find You on Testbook</div>
+                <div class="subsection-header">Friend Requests</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can send you friend requests?</div><div class="setting-description">Control who can add you as a friend</div></div><select class="dropdown" data-setting="Who can send you friend requests"><option selected>Everyone</option><option>Friends of friends</option></select></div>
+                <div class="subsection-header">Phone Number and Email</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can look you up using your email address?</div><div class="setting-description">People with your email can find your profile</div></div><select class="dropdown" data-setting="Who can look you up using email"><option selected>Everyone</option><option>Friends of friends</option><option>Friends</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can look you up using your phone number?</div><div class="setting-description">People with your phone number can find your profile</div></div><select class="dropdown" data-setting="Who can look you up using phone"><option selected>Everyone</option><option>Friends of friends</option><option>Friends</option></select></div>
+                <div class="subsection-header">Search Engines</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Do you want search engines outside of Testbook to link to your profile?</div><div class="setting-description">Your profile appears in Google and other search results</div></div><div class="toggle on" data-setting="Search engines link to profile"><div class="toggle-knob"></div></div></div>
+                <div class="subsection-header">Followers and Comments</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can follow you?</div><div class="setting-description">Control who can follow your public posts</div></div><select class="dropdown" data-setting="Who can follow you"><option>Public</option><option selected>Friends</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can see your followers?</div><div class="setting-description">Control who sees people following you</div></div><select class="dropdown" data-setting="Who can see your followers"><option selected>Public</option><option>Friends</option><option>Only me</option></select></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Who can comment on your public posts?</div><div class="setting-description">Control who can comment on posts set to Public</div></div><select class="dropdown" data-setting="Who can comment on public posts"><option selected>Public</option><option>Friends</option></select></div>
+            </div>
+            
+            <!-- CATEGORY 3: YOUR DATA SETTINGS -->
+            <div class="settings-card">
+                <div class="section-header">Your Data Settings on Testbook</div>
+                <div class="subsection-header">Apps and Websites</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Apps and websites</div><div class="setting-description">Manage third-party apps connected to your account</div></div><button class="action-btn" onclick="openModal('modalApps')" data-setting="Apps and websites">Manage</button></div>
+                <div class="subsection-header">Off-Testbook Activity</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Off-Testbook activity</div><div class="setting-description">View and manage activity collected from other websites and apps</div></div><button class="action-btn" onclick="openModal('modalOffTestbook')" data-setting="Off-Testbook activity">Manage</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Future off-Testbook activity</div><div class="setting-description">Allow Testbook to receive data about what you do on other websites</div></div><div class="toggle on" data-setting="Future off-Testbook activity"><div class="toggle-knob"></div></div></div>
+                <div class="subsection-header">Your Information</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Download your information</div><div class="setting-description">Get a copy of your Testbook data</div></div><button class="action-btn" onclick="openModal('modalDownload')" data-setting="Download your information">Download</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Access your information</div><div class="setting-description">View your Testbook data</div></div><button class="action-btn" data-setting="Access your information">View</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Transfer your information</div><div class="setting-description">Transfer a copy of your data to another service</div></div><button class="action-btn" data-setting="Transfer your information">Transfer</button></div>
+                <div class="subsection-header">Activity History</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Activity log</div><div class="setting-description">View all your Testbook activity</div></div><button class="action-btn" data-setting="Activity log">View</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Search history</div><div class="setting-description">View and clear your Testbook search history</div></div><button class="action-btn" data-setting="Search history">View</button></div>
+            </div>
+            
+            <!-- CATEGORY 4: ACCOUNT SECURE -->
+            <div class="settings-card">
+                <div class="section-header">How to Keep Your Account Secure</div>
+                <div class="subsection-header">Recommended Actions</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Create a passkey</div><div class="setting-description">Securely log in with your fingerprint or face scan instead of a password</div></div><button class="action-btn" data-setting="Create a passkey">Set Up</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Change your password</div><div class="setting-description">Update your password to something that isn't used anywhere else</div></div><button class="action-btn" data-setting="Change your password">Change</button></div>
+                <div class="subsection-header">Review</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Contact info</div><div class="setting-description">Review your email and phone number</div></div><button class="action-btn" data-setting="Contact info">Review</button></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Where you're logged in</div><div class="setting-description">See devices currently logged into your account</div></div><button class="action-btn" data-setting="Where you're logged in">Review</button></div>
+                <div class="subsection-header">Additional Security Steps</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Meta Pay</div><div class="setting-description">Manage payment methods and security</div></div><button class="action-btn" data-setting="Meta Pay">Manage</button></div>
+            </div>
+            
+            <!-- CATEGORY 5: AD PREFERENCES -->
+            <div class="settings-card">
+                <div class="section-header">Your Ad Preferences on Testbook</div>
+                <div class="subsection-header">About Ads on Testbook</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Ads shown outside of Testbook</div><div class="setting-description">Your data used to show you ads on other websites and apps</div></div><div class="toggle on" data-setting="Ads shown outside of Testbook"><div class="toggle-knob"></div></div></div>
+                <div class="subsection-header">Profile Information</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Profile info for ads: Relationship status</div><div class="setting-description">Advertisers can target you based on relationship status</div></div><div class="toggle on" data-setting="Profile info for ads: Relationship status"><div class="toggle-knob"></div></div></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Profile info for ads: Employer</div><div class="setting-description">Advertisers can target you based on your workplace</div></div><div class="toggle on" data-setting="Profile info for ads: Employer"><div class="toggle-knob"></div></div></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Profile info for ads: Job title</div><div class="setting-description">Advertisers can target you based on your position</div></div><div class="toggle on" data-setting="Profile info for ads: Job title"><div class="toggle-knob"></div></div></div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Profile info for ads: Education</div><div class="setting-description">Advertisers can target you based on your school</div></div><div class="toggle on" data-setting="Profile info for ads: Education"><div class="toggle-knob"></div></div></div>
+                <div class="subsection-header">Social Interactions</div>
+                <div class="setting"><div class="setting-info"><div class="setting-name">Social interactions in ads</div><div class="setting-description">Your likes and follows shown to friends in ads</div></div><select class="dropdown" data-setting="Social interactions in ads"><option selected>Friends</option><option>Only me</option></select></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const originalTasks = [
+            "Turn off the setting that allows other websites to use your Testbook activity to show you ads",
+            "Turn on the setting to review tags before they appear on your posts",
+            "Stop Testbook from receiving data about what you do on other websites in the future",
+            "Change who can see your future posts to Friends only",
+            "Clear your off-Testbook activity history",
+            "Turn off ad targeting based on your education",
+            "Change your public profile info to Full",
+            "Limit all third-party apps and websites from accessing your Testbook data to public",
+            "Find where to block a profile or page"
+        ];
+        
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        const tasks = originalTasks;
+        let currentTask = 0;
+        let startTime = 0;
+        let timerInterval = null;
+        let lastChangedSetting = "None detected";
+        
+        document.getElementById('taskText').textContent = tasks[0];
+        
+        function trackSetting(settingName) {
+            lastChangedSetting = settingName;
+        }
+        
+        function startTask() {
+            document.getElementById('taskScreen').classList.add('hidden');
+            document.getElementById('mainInterface').classList.add('visible');
+            document.getElementById('taskBar').classList.remove('hidden');
+            document.getElementById('taskBarText').innerHTML = '<strong>Task ' + (currentTask + 1) + ':</strong> ' + tasks[currentTask];
+            document.getElementById('completeBar').classList.remove('hidden');
+            lastChangedSetting = "None detected";
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 10);
+            window.scrollTo(0, 0);
+        }
+        
+        function updateTimer() {
+            const elapsed = (Date.now() - startTime) / 1000;
+            document.getElementById('timerDisplay').textContent = elapsed.toFixed(2);
+        }
+        
+        function completeTask() {
+            clearInterval(timerInterval);
+            const elapsed = (Date.now() - startTime) / 1000;
+            document.getElementById('mainInterface').classList.remove('visible');
+            document.getElementById('taskBar').classList.add('hidden');
+            document.getElementById('completeBar').classList.add('hidden');
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('visible'));
+            document.getElementById('resultsTime').textContent = elapsed.toFixed(2) + 's';
+            document.getElementById('settingName').textContent = lastChangedSetting;
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            if (currentTask >= tasks.length - 1) {
+                document.getElementById('nextBtn').textContent = 'Finish Study →';
+            }
+        }
+        
+        function nextTask() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            currentTask++;
+            if (currentTask >= tasks.length) {
+                document.getElementById('finalScreen').classList.remove('hidden');
+            } else {
+                document.getElementById('taskNumber').textContent = 'Task ' + (currentTask + 1) + ' of 9';
+                document.getElementById('taskText').textContent = tasks[currentTask];
+                document.getElementById('taskScreen').classList.remove('hidden');
+                resetInterface();
+            }
+        }
+        
+        function resetInterface() {
+            lastChangedSetting = "None detected";
+            document.querySelectorAll('.toggle').forEach((toggle) => {
+                const setting = toggle.getAttribute('data-setting') || '';
+                if (setting.includes('Review tags') || setting.includes('Review tagged')) {
+                    toggle.classList.remove('on');
+                } else {
+                    toggle.classList.add('on');
+                }
+            });
+            resetOffTestbook();
+        }
+        
+        function openModal(id) { document.getElementById(id).classList.add('visible'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
+        
+        function disconnectSite(itemId) {
+            document.getElementById(itemId).style.display = 'none';
+            trackSetting('Off-Testbook activity');
+            checkOffTestbookEmpty();
+        }
+        
+        function clearAllOffTestbook() {
+            document.getElementById('offItem1').style.display = 'none';
+            document.getElementById('offItem2').style.display = 'none';
+            document.getElementById('offItem3').style.display = 'none';
+            trackSetting('Off-Testbook activity');
+            checkOffTestbookEmpty();
+        }
+        
+        function checkOffTestbookEmpty() {
+            var item1 = document.getElementById('offItem1').style.display === 'none';
+            var item2 = document.getElementById('offItem2').style.display === 'none';
+            var item3 = document.getElementById('offItem3').style.display === 'none';
+            if (item1 && item2 && item3) {
+                document.getElementById('offEmptyMsg').style.display = 'block';
+            }
+        }
+        
+        function resetOffTestbook() {
+            document.getElementById('offItem1').style.display = 'flex';
+            document.getElementById('offItem2').style.display = 'flex';
+            document.getElementById('offItem3').style.display = 'flex';
+            document.getElementById('offEmptyMsg').style.display = 'none';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track toggles
+            document.querySelectorAll('.toggle').forEach(function(toggle) {
+                toggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.classList.toggle('on');
+                    const setting = this.getAttribute('data-setting');
+                    if (setting) trackSetting(setting);
+                });
+            });
+            
+            // Track dropdowns
+            document.querySelectorAll('.dropdown').forEach(function(dropdown) {
+                dropdown.addEventListener('change', function() {
+                    const setting = this.getAttribute('data-setting');
+                    if (setting) trackSetting(setting + ' → ' + this.value);
+                });
+            });
+            
+            // Track buttons
+            document.querySelectorAll('.action-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const setting = this.getAttribute('data-setting');
+                    if (setting) trackSetting(setting);
+                });
+            });
+            
+            // Track modal buttons
+            document.querySelectorAll('.modal-btn-primary, .modal-remove-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const setting = this.getAttribute('data-setting');
+                    if (setting) trackSetting(setting);
+                });
+            });
+        });
+        
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('visible');
+            });
+        });
+    </script>
+</body>
+</html>
