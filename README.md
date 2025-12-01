@@ -26,7 +26,7 @@ Measurements include task completion time and setting changed. Please right down
 and the task complete button for Interface B. Once pressing the task complete button, it will record the last setting changed and the timer to complete the current task.
 
 IMPORTANT CORRECTION TO EXPLORATORY TASK:
-Out of the nine settings that were configured, identify the three tasks that involve configuring future data to flow between Testbook and outside websites or applications.
+Out of the nine settings that were configured, identify the three tasks that involve controlling future data sharing between Testbook and outside websites or applications.
 
 System Usability Scale:
 Determine how useful the mock and experimental user interface are from the ten questions after completing the task experiments.
